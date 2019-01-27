@@ -22,7 +22,7 @@
 		"predemo": "npm run lint",
 		"bundle": "npm run rollup && npm run uglify",
 		"compile": "ngc -p tsconfig-aot.json",
-		"lint": "tslint -c tslint.json -t stylish 'src/**/*.ts'",
+		"lint": "echo coucou",
 		"rollup": "rollup -c rollup.config.js",
 		"uglify": "uglifyjs --comments 'license' -o ./dist/bundles/ngx-leaflet.min.js -- ./dist/bundles/ngx-leaflet.js",
 		"watch": " watch 'npm run lint' ./src"
@@ -32,8 +32,8 @@
 		"src"
 	],
 	"peerDependencies": {
-		"@angular/core": ">=7",
 		"@angular/common": ">=7",
+		"@angular/core": ">=7",
 		"leaflet": "1"
 	},
 	"devDependencies": {
@@ -72,5 +72,8 @@
 		"webpack-dev-server": "3",
 		"webpack-stats-plugin": "0.2",
 		"zone.js": "0.8"
+	},
+	"dependencies": {
+		"leaflet.vectorgrid": "^1.3.0"
 	}
 }

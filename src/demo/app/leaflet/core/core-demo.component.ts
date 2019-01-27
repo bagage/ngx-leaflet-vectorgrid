@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 
 import { latLng, LatLng, tileLayer } from 'leaflet';
+
+import * as L from 'leaflet';
+import "leaflet.vectorgrid";
 
 @Component({
 	selector: 'leafletCoreDemo',
@@ -10,8 +13,8 @@ export class LeafletCoreDemoComponent {
 
 	optionsSpec: any = {
 		layers: [{ url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: 'Open Street Map' }],
-		zoom: 5,
-		center: [ 46.879966, -121.726909 ]
+		zoom: 8,
+		center: [ 44.8549, 5.4987 ]
 	};
 
 	// Leaflet bindings
@@ -28,6 +31,41 @@ export class LeafletCoreDemoComponent {
 	zoomLevels = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ];
 	lat = this.center.lat;
 	lng = this.center.lng;
+
+constructor(private zone: NgZone) { }
+
+  stylingFunction(p: any): any {
+  	if (p.insee.indexOf('100') === -1) {
+  		// return { weight: 0, fill: false};
+  	}
+    return {
+      weight: 2,
+      color: 'red',
+      opacity: 1,
+      fill: true,
+      radius: 1,
+      fillOpacity: 0.8
+    };
+  }
+
+  onMapReady(map: any) {
+    // noinspection JSUnusedGlobalSymbols
+    const vectorTileOptions = {
+      vectorTileLayerStyles: {
+        "cities-point": (p: any) =>
+          this.stylingFunction(p),
+      },
+      interactive: true // Make sure that this VectorGrid fires mouse/pointer events
+    };
+
+    this.zone.runOutsideAngular(() => {
+	    L.vectorGrid.protobuf(
+	      "http://localhost:9999/maps/batimap/{z}/{x}/{y}.vector.pbf",
+	      // "https://cadastre.damsy.net/tiles/maps/batimap/{z}/{x}/{y}.vector.pbf",
+	      vectorTileOptions
+	    ).addTo(map);
+	});
+  }
 
 	// Output binding for center
 	onCenterChange(center: LatLng) {
