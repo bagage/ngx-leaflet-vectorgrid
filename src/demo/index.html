@@ -6,20 +6,93 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<title>Angular Leaflet Demo Application</title>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
 
 	<!-- base url -->
 	<base href="/">
 
 </head>
-<body>
+<body style="display: flex;">
 
 	<script>window.__theme = 'bs4';</script>
 
+	<div id="map42" style="flex: 1"></div>
+
 	<app-component>
-		<div style="margin:20px; font-face:sans-serif; font-size:16px;">
-			Loading...
-		</div>
 	</app-component>
+
+	<script type="text/javascript"  src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+	<script type="text/javascript"  src="https://unpkg.com/leaflet.vectorgrid@1.2.0"></script>
+	<!-- <script type="text/javascript" src="../dist/Leaflet.VectorGrid.bundled.js"></script> -->
+	<script>
+
+		var map = L.map('map42');
+		var openmaptilesUrl = "http://localhost:9999/maps/batimap/{z}/{x}/{y}.vector.pbf";// "https://free-{s}.tilehosting.com/data/v3/{z}/{x}/{y}.pbf.pict?key={key}";
+		var openmaptilesAttribution = '<a href="https://openmaptiles.org/">&copy; OpenMapTiles</a>, <a href="http://www.openstreetmap.org/copyright">&copy; OpenStreetMap</a> contributors';
+		var openmaptilesKey = 'UmmATPUongHdDmIicgs7';
+
+
+		var vectorTileOptions = {
+			rendererFactory: L.canvas.tile,
+			attribution: openmaptilesAttribution,
+			key: openmaptilesKey,
+			subdomains: '0123',	// 01234 for openmaptiles, abcd for mapbox
+			maxNativeZoom: 14,
+			vectorTileLayerStyles: {
+				'cities-point': function(properties, zoom) {
+				    return {
+				      weight: 2,
+				      color: 'red',
+				      opacity: 1,
+				      fill: true,
+				      radius: 1,
+				      fillOpacity: 0.8
+				    }
+				}
+			},
+			interactive: true,	// Make sure that this VectorGrid fires mouse/pointer events
+			getFeatureId: function(f) {
+				return f.properties.osm_id;
+			}
+		};
+
+		L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+		var highlight;
+		var clearHighlight = function() {
+			if (highlight) {
+				pbfLayer.resetFeatureStyle(highlight);
+			}
+			highlight = null;
+		};
+		var pbfLayer = L.vectorGrid.protobuf(openmaptilesUrl, vectorTileOptions)
+			.on('click', function(e) {	// The .on method attaches an event handler
+				L.popup()
+					.setContent(e.layer.properties.name || e.layer.properties.type)
+// 					.setContent(JSON.stringify(e.layer))
+					.setLatLng(e.latlng)
+					.openOn(map);
+
+				clearHighlight();
+				highlight = e.layer.properties.osm_id;
+				pbfLayer.setFeatureStyle(highlight, {
+					weight: 2,
+					color: 'red',
+					opacity: 1,
+					fillColor: 'red',
+					fill: true,
+					radius: 6,
+					fillOpacity: 1
+				})
+
+				L.DomEvent.stop(e);
+			})
+			.addTo(map);
+
+		map.on('click', clearHighlight);
+
+		map.setView([44.8383, 5.5028], 8);
+	</script>
 
 </body>
 </html>

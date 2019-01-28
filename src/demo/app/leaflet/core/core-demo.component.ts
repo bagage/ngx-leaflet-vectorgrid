@@ -14,7 +14,7 @@ export class LeafletCoreDemoComponent {
 	optionsSpec: any = {
 		layers: [{ url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: 'Open Street Map' }],
 		zoom: 8,
-		center: [ 44.8549, 5.4987 ]
+		center: [44.8383, 5.5028]
 	};
 
 	// Leaflet bindings
@@ -55,7 +55,7 @@ constructor(private zone: NgZone) { }
         "cities-point": (p: any) =>
           this.stylingFunction(p),
       },
-      interactive: true // Make sure that this VectorGrid fires mouse/pointer events
+      interactive: false // Make sure that this VectorGrid fires mouse/pointer events
     };
 
     this.zone.runOutsideAngular(() => {
